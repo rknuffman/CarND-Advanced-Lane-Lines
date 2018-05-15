@@ -24,7 +24,6 @@ def undistort(calpath):
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
     return mtx, dist
 
-# def abs_sobel_thresh(img, orient='x', thresh_min=0, thresh_max=255):
 def abs_sobel_thresh(img, orient='x', sobel_kernel=3, thresh=(0, 255)):
     # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -125,13 +124,11 @@ def lane_edges(img):
     return combined_binary
 
 def lane_poly(binary_warped, nwindows=9, margin=100, minpix=50):
-    # Assuming you have created a warped binary image called "binary_warped"
     # Take a histogram of the bottom half of the image
     histogram = np.sum(binary_warped[binary_warped.shape[0]//2:,:], axis=0)
     # Create an output image to draw on and  visualize the result
     out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
     # Find the peak of the left and right halves of the histogram
-    # These will be the starting point for the left and right lines
     midpoint = np.int(histogram.shape[0]//2)
     leftx_base = np.argmax(histogram[:midpoint])
     rightx_base = np.argmax(histogram[midpoint:]) + midpoint
@@ -261,10 +258,7 @@ def radius_of_curvature(binary_warped, left_fit, right_fit, xm_per_pix=3.7/900, 
     # Calculate the new radii of curvature
     left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
     right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
-    # Now our radius of curvature is in meters
 
-#     avg_curverad = (left_curverad + right_curverad)/2.
-#     return avg_curverad
     return min(left_curverad, right_curverad)
 
 def dist_from_center(binary_warped, left_fitx, right_fitx, xm_per_pix=3.7/700):
